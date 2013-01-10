@@ -29,7 +29,7 @@ $(document).ready(function () {
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
         xhr.open("GET", tokenInfoEndpoint + "?access_token=" + accessToken, true);
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             var response = JSON.parse(xhr.responseText);
             userId = response.user_id;
             callback();
@@ -42,7 +42,7 @@ $(document).ready(function () {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", getRootUri() + "music" + dirName, true);
         xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             var response = JSON.parse(xhr.responseText);
 
             currentDirectoryEntries = new Array();
@@ -50,20 +50,35 @@ $(document).ready(function () {
             for (i in response) {
                 if (i.lastIndexOf("/") === i.length - 1) {
                     // directory
-                    currentDirectoryEntries.push({fileName: i.substring(0,i.length-1), fileTime: response[i], isDirectory: true});          
+                    currentDirectoryEntries.push({
+                        fileName: i.substring(0, i.length - 1),
+                        fileTime: response[i],
+                        isDirectory: true
+                    });
                 } else {
                     // file
-                    currentDirectoryEntries.push({fileName: i, fileTime: response[i], isDirectory: false});          
+                    currentDirectoryEntries.push({
+                        fileName: i,
+                        fileTime: response[i],
+                        isDirectory: false
+                    });
                 }
             }
             currentDirectoryEntries.sort(sortDirectory);
 
             if (dirName !== "/") {
-                currentDirectoryEntries.unshift({fileName: "..", fileTime: 0, isDirectory: true});
+                currentDirectoryEntries.unshift({
+                    fileName: "..",
+                    fileTime: 0,
+                    isDirectory: true
+                });
             }
 
             currentDirectoryName = dirName;
-            $("#folderListTable").html($("#folderListTemplate").render({dirName: dirName, entry: currentDirectoryEntries}));
+            $("#folderListTable").html($("#folderListTemplate").render({
+                dirName: dirName,
+                entry: currentDirectoryEntries
+            }));
             if (currentDirectoryName === playingDirectoryName) {
                 // if we watch the directory again we are playing 
                 // from we mark the file playing
@@ -80,7 +95,7 @@ $(document).ready(function () {
         xhr.open("GET", getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'], true);
         xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
         xhr.responseType = "arraybuffer";
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             var blob = new Blob([xhr.response]);
             document.getElementById("player").src = window.URL.createObjectURL(blob);
             document.getElementById("player").play();
@@ -94,14 +109,14 @@ $(document).ready(function () {
         xhr.send();
     }
 
-    $(document).on('click', '#folderListTable a.file', function() {
+    $(document).on('click', '#folderListTable a.file', function () {
         playingDirectoryEntries = currentDirectoryEntries;
         playingFileIndex = $(this).data("fileIndex");
         playingDirectoryName = currentDirectoryName;
         playSong();
     });
 
-    $(document).on('click', '#folderListTable a.dir', function() {
+    $(document).on('click', '#folderListTable a.dir', function () {
         var dirName = currentDirectoryEntries[$(this).data('fileIndex')]['fileName'];
         var filePath;
         if (dirName === "..") {
@@ -118,13 +133,13 @@ $(document).ready(function () {
     document.getElementById("prev").addEventListener('click', playPrevSong);
     document.getElementById("next").addEventListener('click', playNextSong);
 
-//    document.getElementById("player").addEventListener('playing', function(e) {
-//        $("span#duration").html(Math.floor(document.getElementById("player").duration));
-//    });
+    //    document.getElementById("player").addEventListener('playing', function(e) {
+    //        $("span#duration").html(Math.floor(document.getElementById("player").duration));
+    //    });
 
-//    document.getElementById("player").addEventListener('timeupdate', function(e) {
-//        $("span#currentTime").html(Math.floor(document.getElementById("player").currentTime));
-//    });
+    //    document.getElementById("player").addEventListener('timeupdate', function(e) {
+    //        $("span#currentTime").html(Math.floor(document.getElementById("player").currentTime));
+    //    });
 
     function playPrevSong() {
         if (currentDirectoryName === playingDirectoryName) {
@@ -135,10 +150,10 @@ $(document).ready(function () {
 
         currentlyPlayingFileIndex = playingFileIndex;
 
-        if (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex -1]['fileName'] !== "..") {
+        if (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex - 1]['fileName'] !== "..") {
             do {
                 playingFileIndex--;
-            } while(playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex]['isDirectory'] && playingDirectoryEntries[playingFileIndex -1]['fileName'] !== "..");
+            } while (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex]['isDirectory'] && playingDirectoryEntries[playingFileIndex - 1]['fileName'] !== "..");
         }
 
         if (playingDirectoryEntries[playingFileIndex]['isDirectory']) {
@@ -151,7 +166,7 @@ $(document).ready(function () {
         if (currentDirectoryName === playingDirectoryName) {
             // if we still watch the same directory as where we play 
             // from we mark the file as not playing anymore
-                $("tr#entry_" + playingFileIndex).removeClass("success");
+            $("tr#entry_" + playingFileIndex).removeClass("success");
         }
         playingFileIndex++;
         // as long as we find directories we move on...
@@ -176,7 +191,7 @@ $(document).ready(function () {
         return (a.fileName === b.fileName) ? 0 : (a.fileName < b.fileName) ? -1 : 1;
     }
 
-    verifyAccessToken(function() {
+    verifyAccessToken(function () {
         renderFolderList("/");
     });
 
