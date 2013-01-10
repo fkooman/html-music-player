@@ -1,7 +1,7 @@
-remoteStorage.onWidget('ready', function () {
+$(document).ready(function () {
 
     // rootUri, this should be available through fragment or using Webfinger
-    var rootUri = remoteStorage.getStorageHref()+'/';
+    var rootUri = apiEndpoint + "/ffe359e390f5a0bca7c73e97352ae02cc5448ff3/";
 
     var apiScope = ["music:r"];
 
@@ -13,8 +13,18 @@ remoteStorage.onWidget('ready', function () {
     var currentDirectoryName;
     var currentDirectoryEntries;
 
+    jso_configure({
+        "html-music-player": {
+            client_id: apiClientId,
+            authorization: authorizeEndpoint
+        }
+    });
+    jso_ensureTokens({
+        "html-music-player": apiScope
+    });
+
     function renderFolderList(dirName) {
-        var accessToken = remoteStorage.getBearerToken();
+        var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
         xhr.open("GET", rootUri + "music" + dirName, true);
         xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
