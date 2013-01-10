@@ -1,9 +1,7 @@
 $(document).ready(function () {
-
-    // rootUri, this should be available through fragment or using Webfinger
-    var rootUri = apiEndpoint + "/ffe359e390f5a0bca7c73e97352ae02cc5448ff3/";
-
     var apiScope = ["music:r"];
+
+    var userId;
 
     var playingFileIndex;
     var playingDirectoryName;
@@ -23,10 +21,26 @@ $(document).ready(function () {
         "html-music-player": apiScope
     });
 
+    function getRootUri() {
+        return apiEndpoint + "/" + userId + "/";
+    }
+
+    function verifyAccessToken(callback) {
+        var accessToken = jso_getToken("html-music-player", apiScope);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", tokenInfoEndpoint + "?access_token=" + accessToken, true);
+        xhr.onload = function(e) {
+            var response = JSON.parse(xhr.responseText);
+            userId = response.user_id;
+            callback();
+        }
+        xhr.send();
+    }
+
     function renderFolderList(dirName) {
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", rootUri + "music" + dirName, true);
+        xhr.open("GET", getRootUri() + "music" + dirName, true);
         xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
         xhr.onload = function(e) {
             var response = JSON.parse(xhr.responseText);
@@ -62,7 +76,7 @@ $(document).ready(function () {
     function playSong() {
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", rootUri + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'], true);
+        xhr.open("GET", getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'], true);
         xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
         xhr.responseType = "arraybuffer";
         xhr.onload = function(e) {
@@ -171,5 +185,9 @@ $(document).ready(function () {
         return (a.fileName === b.fileName) ? 0 : (a.fileName < b.fileName) ? -1 : 1;
     }
 
-    renderFolderList("/");
+    verifyAccessToken(function() {
+        alert(userId);
+        renderFolderList("/");
+    });
+
 });
