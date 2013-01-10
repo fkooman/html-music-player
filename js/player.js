@@ -133,10 +133,16 @@ $(document).ready(function () {
             $("tr#entry_" + playingFileIndex).removeClass("success");
         }
 
+        currentlyPlayingFileIndex = playingFileIndex;
+
         if (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex -1]['fileName'] !== "..") {
             do {
                 playingFileIndex--;
             } while(playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex]['isDirectory'] && playingDirectoryEntries[playingFileIndex -1]['fileName'] !== "..");
+        }
+
+        if (playingDirectoryEntries[playingFileIndex]['isDirectory']) {
+            playingFileIndex = currentlyPlayingFileIndex;
         }
         playSong();
     }
