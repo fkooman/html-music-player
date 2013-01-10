@@ -186,7 +186,6 @@ $(document).ready(function () {
     }
 
     verifyAccessToken(function() {
-        alert(userId);
         renderFolderList("/");
     });
 
