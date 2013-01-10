@@ -8,8 +8,11 @@ server.
 ![html-music-player](https://github.com/fkooman/html-music-player/raw/master/docs/html-music-player-screenshot.png)
 
 ## Features
-* Browse through "music" remoteStorage file system
-* Automatically play the next song in the directory
+* Browse through "music" remoteStorage folder
+* Automatically play the next song in the folder from which the playing 
+  was started, even when browsing other folders
+* Previous and Next buttons to change songs
+* Key bindings (arrow keys) for previous and next song
 
 ## Installation
 This application depends on the following components:
@@ -33,15 +36,17 @@ modifying the `config.js` file to suit your situation.
 
 This is the default configuration:
 
-    var apiClientId = 'html-music-player';
+    var apiClientId       = 'html-music-player';
     var authorizeEndpoint = 'http://localhost/php-oauth/authorize.php';
-    var apiEndpoint = 'http://localhost/php-remoteStorage/api.php';
+    var tokenInfoEndpoint = 'http://localhost/php-oauth/tokeninfo.php';
+    var apiEndpoint       = 'http://localhost/php-remoteStorage/api.php';
 
 For example, for your situation it may need to be this:
 
-    var apiClientId = 'html-music-player';
+    var apiClientId       = 'html-music-player';
     var authorizeEndpoint = 'https://www.example.org/php-oauth/authorize.php';
-    var apiEndpoint = 'https://www.example.org/php-remoteStorage/api.php';
+    var tokenInfoEndpoint = 'https://www.example.org/php-oauth/tokeninfo.php';
+    var apiEndpoint       = 'https://www.example.org/php-remoteStorage/api.php';
 
 ## Client Registration
 Also, make sure that this client is registered in your OAuth server. The following
@@ -58,7 +63,7 @@ information will be relevant:
     <th>Description</th><td>Play your music stored on a remoteStorage server.</td>
   </tr>
   <tr>
-    <th>Scope</th><td>music:r</td>
+    <th>Required Scope</th><td>music:r</td>
   </tr>
   <tr>
     <th>Profile</th><td>User-agent-based Application</td>
