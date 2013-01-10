@@ -10,7 +10,7 @@
 
 <body>
     <div class="container">
-
+        <div id="remotestorage-widget"></div>
         <h1>Music Player</h1>
         <p class="lead">This application lets you play music on your remoteStorage.</p>
 
@@ -48,14 +48,32 @@
         </table>
     </script>
 
+    <script src="ext/js/remoteStorage.js"></script>
     <script src="ext/js/jquery.js"></script>
     <script src="ext/js/jsrender.js"></script>
-    <script src="ext/js/jso.js"></script>
     <script src="ext/bootstrap/js/bootstrap.min.js"></script>
     <script src="config/config.js"></script>
     <script src="js/player.js"></script>
     <script type="text/javascript">
-	$.views.tags({
+	remoteStorage.defineModule('music', function(privateClient, publicClient) {
+        return {
+            exports: {
+                dontSync: function () {
+                    privateClient.release('');
+                    publicClient.release('');
+                }
+            }
+        };
+    });
+    remoteStorage.claimAccess({
+        music: 'r'
+    }).then(function() {
+        remoteStorage.displayWidget('remotestorage-widget');
+        remoteStorage.music.dontSync();
+    });
+     
+
+    $.views.tags({
 		fields: function( object ) {
 			var key,
 				ret = "";
