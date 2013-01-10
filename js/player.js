@@ -133,6 +133,21 @@ $(document).ready(function () {
     document.getElementById("prev").addEventListener('click', playPrevSong);
     document.getElementById("next").addEventListener('click', playNextSong);
 
+    $(document).keydown(function(e){
+        switch(e.which) {
+            case 37: // left
+            playPrevSong();
+            break;
+
+            case 39: // right
+            playNextSong();
+            break;
+
+            default: return; // exit this handler for other keys
+        }
+        e.preventDefault();
+    });
+
     //    document.getElementById("player").addEventListener('playing', function(e) {
     //        $("span#duration").html(Math.floor(document.getElementById("player").duration));
     //    });
