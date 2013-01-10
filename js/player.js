@@ -74,6 +74,7 @@ $(document).ready(function () {
     }
 
     function playSong() {
+        console.log("[html-music-player] playing " + playingFileIndex + " from " + playingDirectoryName);
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
         xhr.open("GET", getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'], true);
@@ -86,6 +87,7 @@ $(document).ready(function () {
             if (currentDirectoryName === playingDirectoryName) {
                 // if we still watch the same directory as where we play 
                 // from we mark the file playing
+                $("a.file").parent().parent().removeClass("success");
                 $("tr#entry_" + playingFileIndex).addClass("success");
             }
         }
