@@ -91,22 +91,15 @@ $(document).ready(function () {
     function playSong() {
         console.log("[html-music-player] playing " + playingFileIndex + " from " + playingDirectoryName);
         var accessToken = jso_getToken("html-music-player", apiScope);
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'], true);
-        xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
-        xhr.responseType = "arraybuffer";
-        xhr.onload = function (e) {
-            var blob = new Blob([xhr.response]);
-            document.getElementById("player").src = window.URL.createObjectURL(blob);
-            document.getElementById("player").play();
-            if (currentDirectoryName === playingDirectoryName) {
-                // if we still watch the same directory as where we play 
-                // from we mark the file playing
-                $("a.file").parent().parent().removeClass("success");
-                $("tr#entry_" + playingFileIndex).addClass("success");
-            }
+        var songUrl = getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'] + "?access_token=" + accessToken;
+        document.getElementById("player").src = songUrl; //window.URL.createObjectURL(blob);
+        document.getElementById("player").play();
+        if (currentDirectoryName === playingDirectoryName) {
+            // if we still watch the same directory as where we play 
+            // from we mark the file playing
+            $("a.file").parent().parent().removeClass("success");
+            $("tr#entry_" + playingFileIndex).addClass("success");
         }
-        xhr.send();
     }
 
     $(document).on('click', '#folderListTable a.file', function () {
@@ -129,6 +122,7 @@ $(document).ready(function () {
     });
 
     document.getElementById("player").addEventListener('ended', playNextSong);
+    document.getElementById("player").addEventListener('error', playNextSong);
 
     document.getElementById("prev").addEventListener('click', playPrevSong);
     document.getElementById("next").addEventListener('click', playNextSong);
