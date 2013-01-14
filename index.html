@@ -37,7 +37,7 @@
                 <tr class="info"><td><small>{{>dirName}}</small></td></tr>
             </thead>
             	<tbody>
-            {{for entries ~showAddToPlaylist=showAddToPlaylist}}
+            {{for entries ~playlistView=playlistView}}
                 <tr id="entry_{{>fileIndex}}">
                     <td>
                     {{if isDirectory}}
@@ -45,8 +45,10 @@
                     {{else}}
                         <i class="icon-file"></i> <a class="file" href="#" data-from-playlist="{{>fromPlaylist}}" data-file-index="{{>fileIndex}}">{{>fileName}}</a> 
 
-                        {{if ~showAddToPlaylist}}
-                            <a class="playlist" href="#" data-file-index="{{>fileIndex}}"><i class="icon-plus-sign" title="Add to playlist"></i></a>
+                        {{if ~playlistView}}
+                            <a class="playlistRemove" href="#" data-file-index="{{>fileIndex}}"><i class="icon-minus-sign" title="Remove from playlist"></i></a>
+                        {{else}}
+                            <a class="playlistAdd" href="#" data-file-index="{{>fileIndex}}"><i class="icon-plus-sign" title="Add to playlist"></i></a>
                         {{/if}}
                     {{/if}}
                     </td>

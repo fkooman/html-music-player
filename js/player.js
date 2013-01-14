@@ -89,7 +89,7 @@ $(document).ready(function () {
             }
 
             $("#folderListTable").html($("#folderListTemplate").render({
-                showAddToPlaylist: true,
+                playlistView: false,
                 dirName: dirName,
                 entries: directoryEntries
             }));
@@ -122,7 +122,7 @@ $(document).ready(function () {
         playSong();
     });
 
-    $(document).on('click', '#folderListTable a.playlist', function () {
+    $(document).on('click', '#folderListTable a.playlistAdd', function () {
         var entry = directoryEntries[$(this).data("fileIndex")];
         // update fileIndex
         entry.fileIndex = playlistEntries.length;
@@ -130,6 +130,23 @@ $(document).ready(function () {
 
         playlistEntries.push(entry);
         console.log("Playlist: " + JSON.stringify(playlistEntries));
+    });
+
+    $(document).on('click', '#folderListTable a.playlistRemove', function () {
+        playlistEntries.splice($(this).data("fileIndex"), 1);
+
+        // update all next entries to get new fileIndex
+        for (var i = $(this).data('fileIndex'); i < playlistEntries.length; i++) {
+            playlistEntries[i].fileIndex--;   
+        }
+
+        // render the new playlist
+        $("#folderListTable").html($("#folderListTemplate").render({
+            playlistView: true,
+            dirName: "Playlist",
+            entries: playlistEntries
+        }));
+
     });
 
     $(document).on('click', '#folderListTable a.dir', function () {
@@ -153,7 +170,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#playlist', function() {
         $("#folderListTable").html($("#folderListTemplate").render({
-            showAddToPlaylist: false,
+            playlistView: true,
             dirName: "Playlist",
             entries: playlistEntries
         }));
