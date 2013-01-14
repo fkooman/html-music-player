@@ -5,19 +5,13 @@ $(document).ready(function () {
 
     // what is being played
     var playingFileIndex;
-    var playingDirectoryName;
-    var playingDirectoryEntries;
+    var playingEntries;
 
     // what is being viewed
-    var currentDirectoryName;
-    var currentDirectoryEntries;
+    var directoryEntries;
 
     // the current playlist
-    var playlistFileIndex;
-    var playlistEntries;
-
-    // playing directory or playlist
-    var playingMode;
+    var playListEntries = [];
 
     jso_configure({
         "html-music-player": {
@@ -53,80 +47,82 @@ $(document).ready(function () {
         xhr.onload = function (e) {
             var response = JSON.parse(xhr.responseText);
 
-            currentDirectoryEntries = new Array();
+            directoryEntries = [];
             // convert the map to an array
             for (i in response) {
                 if (i.lastIndexOf("/") === i.length - 1) {
                     // directory
-                    currentDirectoryEntries.push({
+                    directoryEntries.push({
+                        parentDirectory: dirName,
                         fileName: i.substring(0, i.length - 1),
                         fileTime: response[i],
                         isDirectory: true
                     });
                 } else {
                     // file
-                    currentDirectoryEntries.push({
+                    directoryEntries.push({
+                        parentDirectory: dirName,
                         fileName: i,
                         fileTime: response[i],
                         isDirectory: false
                     });
                 }
             }
-            currentDirectoryEntries.sort(sortDirectory);
+            directoryEntries.sort(sortDirectory);
 
             if (dirName !== "/") {
-                currentDirectoryEntries.unshift({
+                directoryEntries.unshift({
+                    parentDirectory: dirName,
                     fileName: "..",
                     fileTime: 0,
                     isDirectory: true
                 });
             }
 
-            currentDirectoryName = dirName;
             $("#folderListTable").html($("#folderListTemplate").render({
                 dirName: dirName,
-                entry: currentDirectoryEntries
+                entry: directoryEntries
             }));
-            if (currentDirectoryName === playingDirectoryName) {
-                // if we watch the directory again we are playing 
-                // from we mark the file playing
-                $("tr#entry_" + playingFileIndex).addClass("success");
-            }
         }
         xhr.send();
     }
 
     function playSong() {
-        console.log("[html-music-player] playing " + playingFileIndex + " from " + playingDirectoryName);
+        var fileName = playingEntries[playingFileIndex]['fileName'];
+        var parentDirectory = playingEntries[playingFileIndex]['parentDirectory'];
+
+        console.log("[html-music-player] playing " + parentDirectory + fileName);
         var accessToken = jso_getToken("html-music-player", apiScope);
-        var songUrl = getRootUri() + "music" + playingDirectoryName + playingDirectoryEntries[playingFileIndex]['fileName'] + "?access_token=" + accessToken;
-        document.getElementById("player").src = songUrl; //window.URL.createObjectURL(blob);
+        // FIXME: case when rootUri already contains a "?", use "&" instead
+        var songUrl = getRootUri() + "music" + parentDirectory + fileName + "?access_token=" + accessToken;
+        document.getElementById("player").src = songUrl;
         document.getElementById("player").play();
-        if (currentDirectoryName === playingDirectoryName) {
-            // if we still watch the same directory as where we play 
-            // from we mark the file playing
-            $("a.file").parent().parent().removeClass("success");
-            $("tr#entry_" + playingFileIndex).addClass("success");
-        }
     }
 
     $(document).on('click', '#folderListTable a.file', function () {
-        playingDirectoryEntries = currentDirectoryEntries;
+        playingEntries = directoryEntries;
         playingFileIndex = $(this).data("fileIndex");
-        playingDirectoryName = currentDirectoryName;
         playSong();
     });
 
+    $(document).on('click', '#folderListTable a.playList', function () {
+        playListEntries.push(directoryEntries[$(this).data("fileIndex")]);
+        console.log("Playlist: " + JSON.stringify(playListEntries));
+    });
+
     $(document).on('click', '#folderListTable a.dir', function () {
-        var dirName = currentDirectoryEntries[$(this).data('fileIndex')]['fileName'];
-        var filePath;
-        if (dirName === "..") {
-            secondToLastSlash = currentDirectoryName.lastIndexOf("/", currentDirectoryName.length - 2);
-            filePath = currentDirectoryName.substring(0, secondToLastSlash + 1);
+        var fileName = directoryEntries[$(this).data("fileIndex")]['fileName'];
+        var parentDirectory = directoryEntries[$(this).data("fileIndex")]['parentDirectory'];
+
+        if (".." === fileName) {
+            // go one directory up...
+            secondToLastSlash = parentDirectory.lastIndexOf("/", parentDirectory.length - 2);
+            dirName = parentDirectory.substring(0, secondToLastSlash + 1);
         } else {
-            filePath = currentDirectoryName + currentDirectoryEntries[$(this).data('fileIndex')]['fileName'] + "/";
+            // enter the directory...
+            dirName = parentDirectory + fileName + "/";
         }
-        renderFolderList(filePath);
+        renderFolderList(dirName);
     });
 
     document.getElementById("player").addEventListener('ended', playNextSong);
@@ -135,62 +131,47 @@ $(document).ready(function () {
     document.getElementById("prev").addEventListener('click', playPrevSong);
     document.getElementById("next").addEventListener('click', playNextSong);
 
-    $(document).keydown(function(e){
-        switch(e.which) {
-            case 37: // left
-            playPrevSong();
-            break;
+    $(document).keydown(function (e) {
+        switch (e.which) {
+            case 37:
+                // left arrow
+                playPrevSong();
+                break;
 
-            case 39: // right
-            playNextSong();
-            break;
+            case 39:
+                // right arrow
+                playNextSong();
+                break;
 
-            default: return; // exit this handler for other keys
+            default:
+                return;
         }
         e.preventDefault();
     });
 
-    //    document.getElementById("player").addEventListener('playing', function(e) {
-    //        $("span#duration").html(Math.floor(document.getElementById("player").duration));
-    //    });
-
-    //    document.getElementById("player").addEventListener('timeupdate', function(e) {
-    //        $("span#currentTime").html(Math.floor(document.getElementById("player").currentTime));
-    //    });
-
     function playPrevSong() {
-        if (currentDirectoryName === playingDirectoryName) {
-            // if we still watch the same directory as where we play 
-            // from we mark the file as not playing anymore
-            $("tr#entry_" + playingFileIndex).removeClass("success");
-        }
-
         currentlyPlayingFileIndex = playingFileIndex;
 
-        if (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex - 1]['fileName'] !== "..") {
+        if (playingFileIndex > 0 && playingEntries[playingFileIndex - 1]['fileName'] !== "..") {
             do {
                 playingFileIndex--;
-            } while (playingFileIndex > 0 && playingDirectoryEntries[playingFileIndex]['isDirectory'] && playingDirectoryEntries[playingFileIndex - 1]['fileName'] !== "..");
+            } while (playingFileIndex > 0 && playingEntries[playingFileIndex]['isDirectory'] && playingEntries[playingFileIndex - 1]['fileName'] !== "..");
         }
 
-        if (playingDirectoryEntries[playingFileIndex]['isDirectory']) {
+        if (playingEntries[playingFileIndex]['isDirectory']) {
             playingFileIndex = currentlyPlayingFileIndex;
         }
         playSong();
     }
 
     function playNextSong() {
-        if (currentDirectoryName === playingDirectoryName) {
-            // if we still watch the same directory as where we play 
-            // from we mark the file as not playing anymore
-            $("tr#entry_" + playingFileIndex).removeClass("success");
-        }
+        // FIXME: make it similar to playPrevSong, handle more edge cases...
         playingFileIndex++;
         // as long as we find directories we move on...
-        while (playingFileIndex < playingDirectoryEntries.length && playingDirectoryEntries[playingFileIndex]['isDirectory']) {
+        while (playingFileIndex < playingEntries.length && playingEntries[playingFileIndex]['isDirectory']) {
             playingFileIndex++;
         }
-        if (playingFileIndex !== playingDirectoryEntries.length) {
+        if (playingFileIndex !== playingEntries.length) {
             playSong();
         }
     }
