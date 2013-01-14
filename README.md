@@ -7,12 +7,15 @@ server.
 ## Screenshots
 ![html-music-player](https://github.com/fkooman/html-music-player/raw/master/docs/html-music-player-screenshot.png)
 
+![html-music-player](https://github.com/fkooman/html-music-player/raw/master/docs/html-music-player-playlist-screenshot.png)
+
 ## Features
 * Browse through "music" remoteStorage folder
 * Automatically play the next song in the folder from which the playing 
   was started, even when browsing other folders
 * Previous and Next buttons to change songs
 * Key bindings (arrow keys) for previous and next song
+* Playlist support (not finished, no way to store the playlists)
 
 ## Installation
 This application depends on the following components:
