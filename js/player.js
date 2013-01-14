@@ -80,6 +80,7 @@ $(document).ready(function () {
             }
 
             $("#folderListTable").html($("#folderListTemplate").render({
+                showAddToPlayList: true,
                 dirName: dirName,
                 entry: directoryEntries
             }));
@@ -123,6 +124,15 @@ $(document).ready(function () {
             dirName = parentDirectory + fileName + "/";
         }
         renderFolderList(dirName);
+    });
+
+    $(document).on('click', '#playList', function() {
+            $("#playListTable").html($("#folderListTemplate").render({
+                showAddToPlayList: false,
+                dirName: "Playlist",
+                entry: playListEntries
+            }));
+        $('#playListModal').modal();
     });
 
     document.getElementById("player").addEventListener('ended', playNextSong);
