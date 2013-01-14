@@ -12,14 +12,16 @@
     <div class="container">
 
         <h1>Music Player</h1>
-        <p class="lead">This application lets you play music on your remoteStorage.</p>
+        <p class="lead">Your storage, your music.</p>
 
         <div>
             <button class="btn" id="prev"><i class="icon-backward"></i></button>
-            <button class="btn" id="next"><i class="icon-forward"></i></button>
-        </div>
 
-        <audio id="player" controls="true"></audio>
+            <audio id="player" controls="true"></audio>
+
+            <button class="btn" id="next"><i class="icon-forward"></i></button>
+            <button class="btn" id="next"><i class="icon-list"></i></button>
+        </div>
 
         <div id="folderList">
             <div id="folderListTable"></div>
@@ -39,7 +41,7 @@
                     {{if isDirectory}}
                         <i class="icon-folder-open"></i> <a class="dir" href="#" data-file-index="{{>~key}}">{{>fileName}}</a>
                     {{else}}
-                        <i class="icon-play"></i> <a class="file" href="#" data-file-index="{{>~key}}">{{>fileName}}</a>
+                        <i class="icon-file"></i> <a class="file" href="#" data-file-index="{{>~key}}">{{>fileName}}</a> <a href="#" data-file-index="{{>~key}}"><i class="icon-plus-sign" title="Add to playlist"></i></a>
                     {{/if}}
                     </td>
                 </tr>

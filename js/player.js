@@ -3,13 +3,21 @@ $(document).ready(function () {
 
     var userId;
 
+    // what is being played
     var playingFileIndex;
     var playingDirectoryName;
-    // the files in the directory from which the current song is being played
     var playingDirectoryEntries;
 
+    // what is being viewed
     var currentDirectoryName;
     var currentDirectoryEntries;
+
+    // the current playlist
+    var playlistFileIndex;
+    var playlistEntries;
+
+    // playing directory or playlist
+    var playingMode;
 
     jso_configure({
         "html-music-player": {
