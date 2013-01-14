@@ -11,7 +11,7 @@ $(document).ready(function () {
     var directoryEntries;
 
     // the current playlist
-    var playListEntries = [];
+    var playlistEntries = [];
 
     jso_configure({
         "html-music-player": {
@@ -30,6 +30,7 @@ $(document).ready(function () {
     function verifyAccessToken(callback) {
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
+        // FIXME: case when tokenInfoEndpoint already contains a "?", use "&" instead
         xhr.open("GET", tokenInfoEndpoint + "?access_token=" + accessToken, true);
         xhr.onload = function (e) {
             var response = JSON.parse(xhr.responseText);
@@ -49,26 +50,6 @@ $(document).ready(function () {
 
             directoryEntries = [];
             // convert the map to an array
-            for (i in response) {
-                if (i.lastIndexOf("/") === i.length - 1) {
-                    // directory
-                    directoryEntries.push({
-                        parentDirectory: dirName,
-                        fileName: i.substring(0, i.length - 1),
-                        fileTime: response[i],
-                        isDirectory: true
-                    });
-                } else {
-                    // file
-                    directoryEntries.push({
-                        parentDirectory: dirName,
-                        fileName: i,
-                        fileTime: response[i],
-                        isDirectory: false
-                    });
-                }
-            }
-            directoryEntries.sort(sortDirectory);
 
             if (dirName !== "/") {
                 directoryEntries.unshift({
@@ -79,10 +60,38 @@ $(document).ready(function () {
                 });
             }
 
+            for (i in response) {
+                if (i.lastIndexOf("/") === i.length - 1) {
+                    // directory
+                    directoryEntries.push({
+                        parentDirectory: dirName,
+                        fileName: i.substring(0, i.length - 1),
+                        fileTime: response[i],
+                        isDirectory: true,
+                        fromPlaylist: "no"
+                    });
+                } else {
+                    // file
+                    directoryEntries.push({
+                        parentDirectory: dirName,
+                        fileName: i,
+                        fileTime: response[i],
+                        isDirectory: false,
+                        fromPlaylist: "no"
+                    });
+                }
+            }
+            directoryEntries.sort(sortDirectory);
+
+            // add index to the entries
+            for(var i = 0; i < directoryEntries.length; i++) {
+                directoryEntries[i].fileIndex = i;
+            }
+
             $("#folderListTable").html($("#folderListTemplate").render({
-                showAddToPlayList: true,
+                showAddToPlaylist: true,
                 dirName: dirName,
-                entry: directoryEntries
+                entries: directoryEntries
             }));
         }
         xhr.send();
@@ -101,14 +110,26 @@ $(document).ready(function () {
     }
 
     $(document).on('click', '#folderListTable a.file', function () {
-        playingEntries = directoryEntries;
-        playingFileIndex = $(this).data("fileIndex");
+        if ("yes" === $(this).data('fromPlaylist')) {
+            // we started a song in the playlist
+            playingEntries = playlistEntries;
+            playingFileIndex = $(this).data("fileIndex");
+        } else {
+            // we started a song in a directory
+            playingEntries = directoryEntries;
+            playingFileIndex = $(this).data("fileIndex");
+        }
         playSong();
     });
 
-    $(document).on('click', '#folderListTable a.playList', function () {
-        playListEntries.push(directoryEntries[$(this).data("fileIndex")]);
-        console.log("Playlist: " + JSON.stringify(playListEntries));
+    $(document).on('click', '#folderListTable a.playlist', function () {
+        var entry = directoryEntries[$(this).data("fileIndex")];
+        // update fileIndex
+        entry.fileIndex = playlistEntries.length;
+        entry.fromPlaylist = "yes";
+
+        playlistEntries.push(entry);
+        console.log("Playlist: " + JSON.stringify(playlistEntries));
     });
 
     $(document).on('click', '#folderListTable a.dir', function () {
@@ -126,13 +147,16 @@ $(document).ready(function () {
         renderFolderList(dirName);
     });
 
-    $(document).on('click', '#playList', function() {
-            $("#playListTable").html($("#folderListTemplate").render({
-                showAddToPlayList: false,
-                dirName: "Playlist",
-                entry: playListEntries
-            }));
-        $('#playListModal').modal();
+    $(document).on('click', '#browse', function() {
+        renderFolderList('/');
+    });
+
+    $(document).on('click', '#playlist', function() {
+        $("#folderListTable").html($("#folderListTemplate").render({
+            showAddToPlaylist: false,
+            dirName: "Playlist",
+            entries: playlistEntries
+        }));
     });
 
     document.getElementById("player").addEventListener('ended', playNextSong);

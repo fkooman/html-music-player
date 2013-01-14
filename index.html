@@ -20,29 +20,13 @@
             <audio id="player" controls="true"></audio>
 
             <button class="btn" id="next"><i class="icon-forward"></i></button>
-            <button class="btn" id="playList"><i class="icon-list"></i></button>
+
+            <button class="btn" id="browse"><i class="icon-folder-open"></i> Browse</button>            
+            <button class="btn" id="playlist"><i class="icon-list"></i> Playlist</button>
         </div>
 
         <div id="folderList">
             <div id="folderListTable"></div>
-        </div>
-
-        <div id="playListModal" class="modal hide">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Playlist</h3>
-            </div>
-
-            <div class="modal-body">
-                <div id="playListTable"></div>
-            </div>
-
-            <div class="modal-footer">
-                <a href="#" class="btn">Close</a>
-                <!-- <a href="#" class="btn btn-primary">Save changes</a> -->
-            </div>
-        </div>
-
         </div>
 
     </div> <!-- /container -->
@@ -53,17 +37,21 @@
                 <tr class="info"><td><small>{{>dirName}}</small></td></tr>
             </thead>
             	<tbody>
-            {{fields entry}}
-                <tr id="entry_{{>~key}}">
+            {{for entries ~showAddToPlaylist=showAddToPlaylist}}
+                <tr id="entry_{{>fileIndex}}">
                     <td>
                     {{if isDirectory}}
-                        <i class="icon-folder-open"></i> <a class="dir" href="#" data-file-index="{{>~key}}">{{>fileName}}</a>
+                        <i class="icon-folder-open"></i> <a class="dir" href="#" data-file-index="{{>fileIndex}}">{{>fileName}}</a>
                     {{else}}
-                        <i class="icon-file"></i> <a class="file" href="#" data-file-index="{{>~key}}">{{>fileName}}</a> <a class="playList" href="#" data-file-index="{{>~key}}"><i class="icon-plus-sign" title="Add to playlist"></i></a>
+                        <i class="icon-file"></i> <a class="file" href="#" data-from-playlist="{{>fromPlaylist}}" data-file-index="{{>fileIndex}}">{{>fileName}}</a> 
+
+                        {{if ~showAddToPlaylist}}
+                            <a class="playlist" href="#" data-file-index="{{>fileIndex}}"><i class="icon-plus-sign" title="Add to playlist"></i></a>
+                        {{/if}}
                     {{/if}}
                     </td>
                 </tr>
-            {{/fields}}
+            {{/for}}
             </tbody>
         </table>
     </script>
@@ -74,40 +62,5 @@
     <script src="ext/bootstrap/js/bootstrap.min.js"></script>
     <script src="config/config.js"></script>
     <script src="js/player.js"></script>
-    <script type="text/javascript">
-	$.views.tags({
-		fields: function( object ) {
-			var key,
-				ret = "";
-			for ( key in object ) {
-				if ( object.hasOwnProperty( key )) {
-					// For each property/field, render the content of the {{fields object}} tag, with "~key" as template parameter
-					ret += this.renderContent( object[ key ], { key: key });
-				}
-			}
-			return ret;
-		}
-	});
-
-	//Define a custom getFields helper function to iterate over fields and return
-	$.views.helpers({
-		getFields: function( object ) {
-			var key, value,
-				fieldsArray = [];
-			for ( key in object ) {
-				if ( object.hasOwnProperty( key )) {
-					value = object[ key ];
-					// For each property/field add an object to the array, with key and value
-					fieldsArray.push({
-						key: key,
-						value: value
-					});
-				}
-			}
-			// Return the array, to be rendered using {{for ~fields(object)}}
-			return fieldsArray;
-		}
-	});
-    </script>
   </body>
 </html>
