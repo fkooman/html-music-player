@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var apiScope = ["music:r"];
+    var apiScope = ["music:r", "playlist:rw"];
 
     var userId;
 
@@ -36,6 +36,36 @@ $(document).ready(function () {
             var response = JSON.parse(xhr.responseText);
             userId = response.user_id;
             callback();
+        }
+        xhr.send();
+    }
+
+    function savePlaylist() {
+        var accessToken = jso_getToken("html-music-player", apiScope);
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", getRootUri() + "playlist" + "/" + "playlist.json", true);
+        xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+        xhr.onload = function (e) {
+            //var response = JSON.parse(xhr.responseText);
+        }
+        xhr.send(JSON.stringify(playlistEntries));
+    }
+
+    function loadPlaylist() {
+        var accessToken = jso_getToken("html-music-player", apiScope);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", getRootUri() + "playlist" + "/" + "playlist.json", true);
+        xhr.setRequestHeader("Authorization", "Bearer " + accessToken);
+        xhr.onreadystatechange = function (aEvt) {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200 || xhr.status == 304) {
+                    //alert("setting playlist");
+                    playlistEntries = JSON.parse(xhr.responseText);
+                } else {
+                    // alert('empty playlist');
+                    playlistEntries = [];
+                }
+            }
         }
         xhr.send();
     }
@@ -84,7 +114,7 @@ $(document).ready(function () {
             directoryEntries.sort(sortDirectory);
 
             // add index to the entries
-            for(var i = 0; i < directoryEntries.length; i++) {
+            for (var i = 0; i < directoryEntries.length; i++) {
                 directoryEntries[i].fileIndex = i;
             }
 
@@ -130,6 +160,7 @@ $(document).ready(function () {
 
         playlistEntries.push(entry);
         console.log("Playlist: " + JSON.stringify(playlistEntries));
+        savePlaylist();
     });
 
     $(document).on('click', '#folderListTable a.playlistRemove', function () {
@@ -137,8 +168,10 @@ $(document).ready(function () {
 
         // update all next entries to get new fileIndex
         for (var i = $(this).data('fileIndex'); i < playlistEntries.length; i++) {
-            playlistEntries[i].fileIndex--;   
+            playlistEntries[i].fileIndex--;
         }
+
+        savePlaylist();
 
         // render the new playlist
         $("#folderListTable").html($("#folderListTemplate").render({
@@ -164,11 +197,11 @@ $(document).ready(function () {
         renderFolderList(dirName);
     });
 
-    $(document).on('click', '#browse', function() {
+    $(document).on('click', '#browse', function () {
         renderFolderList('/');
     });
 
-    $(document).on('click', '#playlist', function() {
+    $(document).on('click', '#playlist', function () {
         $("#folderListTable").html($("#folderListTemplate").render({
             playlistView: true,
             dirName: "Playlist",
@@ -227,6 +260,7 @@ $(document).ready(function () {
         }
     }
 
+
     function sortDirectory(a, b) {
         if (a.isDirectory && b.isDirectory) {
             return (a.fileName === b.fileName) ? 0 : (a.fileName < b.fileName) ? -1 : 1;
@@ -242,6 +276,7 @@ $(document).ready(function () {
 
     verifyAccessToken(function () {
         renderFolderList("/");
+        loadPlaylist();
     });
 
 });
