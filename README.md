@@ -15,7 +15,7 @@ server.
   was started, even when browsing other folders
 * Previous and Next buttons to change songs
 * Key bindings (arrow keys) for previous and next song
-* Playlist support (not finished, no way to store the playlists)
+* Playlist support
 
 ## Installation
 This application depends on the following components:
