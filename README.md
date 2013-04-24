@@ -39,17 +39,17 @@ modifying the `config.js` file to suit your situation.
 
 This is the default configuration:
 
-    var apiClientId       = 'html-music-player';
-    var authorizeEndpoint = 'http://localhost/php-oauth/authorize.php';
-    var tokenInfoEndpoint = 'http://localhost/php-oauth/tokeninfo.php';
-    var apiEndpoint       = 'http://localhost/php-remoteStorage/api.php';
+    var apiClientId           = 'html-music-player';
+    var authorizeEndpoint     = 'http://localhost/php-oauth/authorize.php';
+    var introspectionEndpoint = 'http://localhost/php-oauth/introspect.php';
+    var apiEndpoint           = 'http://localhost/php-remoteStorage/api.php';
 
 For example, for your situation it may need to be this:
 
-    var apiClientId       = 'html-music-player';
-    var authorizeEndpoint = 'https://www.example.org/php-oauth/authorize.php';
-    var tokenInfoEndpoint = 'https://www.example.org/php-oauth/tokeninfo.php';
-    var apiEndpoint       = 'https://www.example.org/php-remoteStorage/api.php';
+    var apiClientId           = 'html-music-player';
+    var authorizeEndpoint     = 'https://www.example.org/php-oauth/authorize.php';
+    var introspectionEndpoint = 'https://www.example.org/php-oauth/introspect.php';
+    var apiEndpoint           = 'https://www.example.org/php-remoteStorage/api.php';
 
 ## Client Registration
 Also, make sure that this client is registered in your OAuth server. The following

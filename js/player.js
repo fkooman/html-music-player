@@ -30,11 +30,11 @@ $(document).ready(function () {
     function verifyAccessToken(callback) {
         var accessToken = jso_getToken("html-music-player", apiScope);
         var xhr = new XMLHttpRequest();
-        // FIXME: case when tokenInfoEndpoint already contains a "?", use "&" instead
-        xhr.open("GET", tokenInfoEndpoint + "?access_token=" + accessToken, true);
+        // FIXME: case when introspectionEndpoint already contains a "?", use "&" instead
+        xhr.open("GET", introspectionEndpoint + "?token=" + accessToken, true);
         xhr.onload = function (e) {
             var response = JSON.parse(xhr.responseText);
-            userId = response.user_id;
+            userId = response.sub;
             callback();
         }
         xhr.send();
