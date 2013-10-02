@@ -1,0 +1,8 @@
+{
+    "dependencies": {
+        "bootstrap": "~2.3.2", 
+        "jso": "https://github.com/andreassolberg/jso.git", 
+        "jsrender": "~1.0.0-beta"
+    }, 
+    "name": "html-music-player"
+}

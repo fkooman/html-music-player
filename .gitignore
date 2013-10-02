@@ -1,2 +1,2 @@
-ext/
-config/config.js
+/config/config.js
+/bower_components/

@@ -17,20 +17,10 @@ server.
 * Key bindings (arrow keys) for previous and next song
 * Playlist support
 
-## Installation
-This application depends on the following components:
+# Installation
+You can use [Bower](http://bower.io) to install the dependencies.
 
-* jQuery
-* JSrender (JavaScript Template Rendering for jQuery)
-* JSO (JavaScript OAuth 2 client)
-* Bootstrap CSS 
-
-It can easily be installed by running the following script:
-
-    $ sh docs/install_dependencies.sh
-
-This will download the latest version of those components and everything will
-immediately work.
+    $ bower install
 
 ## Configuration
 You need to configure the application to point to your OAuth server. This can
@@ -51,32 +41,13 @@ For example, for your situation it may need to be this:
     var introspectionEndpoint = 'https://www.example.org/php-oauth/introspect.php';
     var apiEndpoint           = 'https://www.example.org/php-remoteStorage/api.php';
 
-## Client Registration
-Also, make sure that this client is registered in your OAuth server. The following
-information will be relevant:
+# Client Registration
+Also, make sure that this client is registered in your OAuth server. The 
+following information could be relevant:
 
-<table>
-  <tr>
-    <th>Identifier</th><td>html-music-player</td>
-  </tr>
-  <tr>
-    <th>Name</th><td>Music Player</td>
-  </tr>
-  <tr>
-    <th>Description</th><td>Play your music stored on a remoteStorage server.</td>
-  </tr>
-  <tr>
-    <th>Required Scope</th><td>music:r</td>
-  </tr>
-  <tr>
-    <th>Profile</th><td>User-agent-based Application</td>
-  </tr>
-  <tr>
-    <th>Secret</th><td><em>NONE</em></td>
-  </tr>
-  <tr>
-    <th>Redirect URI</th><td>https://www.example.org/html-music-player/index.html</td>
-  </tr>
-</table>
-
-That should be all!
+* **Identifier**: html-music-player
+* **Name**: Music Player
+* **Description**: Play your music stored on a remoteStorage server.
+* **Profile**: User-agent-based Application
+* **Secret**: _NONE_
+* **Redirect URI**: https://www.example.org/html-music-player/index.html
